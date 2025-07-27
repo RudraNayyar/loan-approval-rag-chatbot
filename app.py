@@ -5,7 +5,7 @@ from sentence_transformers import SentenceTransformer
 from transformers import pipeline
 import pandas as pd
 
-# File paths
+
 index_path = 'faiss_index.bin'
 embeddings_path = 'embeddings.npy'
 chunks_path = 'chunks.txt'
@@ -22,23 +22,23 @@ def load_resources():
         df = None
     return chunks, index, embedder, df
 
-# Load chunks
+
 def load_chunks(path):
     with open(path, 'r', encoding='utf-8') as f:
         text = f.read()
     return [chunk.strip() for chunk in text.split('\n---\n') if chunk.strip()]
 
-# Embed query
+
 def embed_query(query, model):
     return model.encode([query])[0]
 
-# Retrieve top k chunks
+
 def retrieve(query, model, index, chunks, k=5):
     query_vec = embed_query(query, model)
     D, I = index.search(np.array([query_vec]), k)
     return [chunks[i] for i in I[0]]
 
-# Generate answer using LLM
+
 @st.cache_resource
 def get_generator():
     return pipeline('text2text-generation', model='google/flan-t5-base')
@@ -54,7 +54,7 @@ def generate_answer(question, context):
     result = generator(prompt, max_length=128, do_sample=False)
     return result[0]['generated_text']
 
-# Streamlit UI
+
 st.set_page_config(page_title="Loan Q&A Chatbot", page_icon="💬")
 st.title("Loan Approval Q&A Chatbot")
 st.write("Ask questions about the loan approval dataset!")
