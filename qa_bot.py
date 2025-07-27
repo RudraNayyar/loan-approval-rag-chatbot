@@ -9,29 +9,29 @@ embeddings_path = 'embeddings.npy'
 chunks_path = 'chunks.txt'
 csv_path = 'Training Dataset.csv'
 
-# Load chunks
+
 def load_chunks(path):
     with open(path, 'r', encoding='utf-8') as f:
         text = f.read()
     return [chunk.strip() for chunk in text.split('\n---\n') if chunk.strip()]
 
-# Load FAISS index and embeddings
+
 def load_index_and_embeddings():
     index = faiss.read_index(index_path)
     embeddings = np.load(embeddings_path)
     return index, embeddings
 
-# Embed query
+
 def embed_query(query, model):
     return model.encode([query])[0]
 
-# Retrieve top k chunks
+
 def retrieve(query, model, index, chunks, k=7):
     query_vec = embed_query(query, model)
     D, I = index.search(np.array([query_vec]), k)
     return [chunks[i] for i in I[0]]
 
-# Generate answer using a lightweight LLM
+
 def generate_answer(question, context):
     generator = pipeline('text2text-generation', model='google/flan-t5-large')
     prompt = (
@@ -62,7 +62,7 @@ if __name__ == "__main__":
             print("Goodbye!")
             break
 
-        # Simple keyword-based detection for stats/analytical questions
+        
         q_lower = question.lower()
         if df is not None:
             if "average applicant income" in q_lower:
